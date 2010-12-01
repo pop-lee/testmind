@@ -5,8 +5,6 @@
         <![CDATA[
             import model.MindModel;
             import view.Node;
-            import library.map.IMap;
-            import library.map.HashMap;
             
             public static var mainNode : Node = new Node();
             
