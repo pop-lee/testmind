@@ -1,6 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
-<mx:HBox xmlns:mx="http://www.adobe.com/2006/mxml" width="200" height="100"
+<mx:HBox xmlns:mx="http://www.adobe.com/2006/mxml" width="200" height="100" 
+    mouseDown="dragSource(event,this,'node')"
+    dragEnter="dragEnter(event,'node')"
+    dragDrop="dragDrop(event,'node')"
     creationComplete="creaHandle()" backgroundColor="0xffffff" backgroundAlpha="1" >
+    <mx:Script source="NodeDrag.as" />
     <mx:Script>
         <![CDATA[
             import model.MindModel;
@@ -12,6 +16,8 @@
             
             [Bindable]
             public var nodeContent : String = "";
+            
+            private var _linkLine : LinkLine = new LinkLine();
             
             //线出端点
             [Bindable]
@@ -56,6 +62,10 @@
                 this._parentNode = _parentNode;
                 _parentNode.addChildNode(this);
             }
+            public function get parentNode() : Node
+            {
+                return _parentNode;
+            }
             
             //节点占用空间
             private function get nodeSpace() : Number
@@ -71,19 +81,31 @@
 //                TestMindMap.levelPositionMap.put(
 
                 _node._nodeOldSpace = _node.height;
-                var _obj : Object = new Object();
-                var _linkLine : LinkLine = new LinkLine();
-                _obj.node = _node;
-                _obj.linkLine = _linkLine;
-                MindModel.getInstance().main.addChild(_obj.linkLine);
+//                var _obj : Object = new Object();
+//                var _linkLine : LinkLine = new LinkLine();
+//                _obj.node = _node;
+//                _obj.linkLine = _linkLine;
+//                MindModel.getInstance().main.addChild(_obj.linkLine);
+                MindModel.getInstance().main.addChild(_node._linkLine);
                 
-                this._childNodes.addItem(_obj);
+                this._childNodes.addItem(_node);
                 
                 _childNodes.length>1? 
                     childNodesSpace = _node.nodeSpace + mainModel.nodeSpacing:
-                    childNodesSpace = _node.nodeSpace
+                    childNodesSpace = _node.nodeSpace;
                 
                 refreshLine();
+            }
+            
+            //删除节点
+            public function removeChildNode(_node : Node) : void
+            {
+                _childNodes.length>1?
+                childNodesSpace = 0 - _node.nodeSpace - mainModel.nodeSpacing:
+                childNodesSpace = 0 - _node.nodeSpace;
+                
+                _childNodes.removeItemAt(_childNodes.getItemIndex(_node));
+                refresh();
             }
             
             //设置所有子节点占用空间大小
@@ -139,7 +161,11 @@
                     
                 }
                 _nodeOldSpace = this.height;
-                
+                refresh();
+            }
+            
+            private function refresh() : void
+            {
                 TestMindMap.mainNode.refreshLine();
             }
             
@@ -158,19 +184,19 @@
             //作为父Node画线
             private function refreshLine(event : CollectionEvent=null) : void
             {
-                for each(var _obj : Object in _childNodes)
+                for each(var _node : Node in _childNodes)
                 {
-                    _obj.node.x = this.x + this.width + mainModel.parentSpacing;
-                    _obj.node.y = this.y + this.height/2 - this.nodeSpace/2 + this._rule + _obj.node.nodeSpace/2 - _obj.node.height/2 ;
-                    _rule = _rule + _obj.node.nodeSpace + mainModel.nodeSpacing;
+                    _node.x = this.x + this.width + mainModel.parentSpacing;
+                    _node.y = this.y + this.height/2 - this.nodeSpace/2 + this._rule + _node.nodeSpace/2 - _node.height/2 ;
+                    _rule = _rule + _node.nodeSpace + mainModel.nodeSpacing;
                     
                     
-                    (_obj.linkLine as LinkLine).startPoint = pointOut;
+                    _node._linkLine.startPoint = pointOut;
                     
-                    (_obj.linkLine as LinkLine).endPoint = (_obj.node as Node).pointIn;
+                    _node._linkLine.endPoint = _node.pointIn;
 //                    this.dispatchEvent(pointMove);
-                    (_obj.linkLine as LinkLine).drawLine();
-                    (_obj.node as Node).refreshLine();
+                    _node._linkLine.drawLine();
+                    _node.refreshLine();
                 }
                 _rule = 0;
             }
