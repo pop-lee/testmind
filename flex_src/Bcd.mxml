@@ -1,0 +1,30 @@
+<?xml version="1.0"?>
+<mx:Application xmlns:mx="http://www.adobe.com/2006/mxml">
+    <mx:XML id="capitals">
+        <root>
+            <Capitals label="U.S. State Capitals">
+                <capital label="AL" value="Montgomery"/>
+                <capital label="AK" value="Juneau"/>
+                <capital label="AR" value="Little Rock"/>
+                <capital label="AZ" value="Phoenix"/>
+            </Capitals>
+            <Capitals label="Canadian Province Capitals">
+                <capital label="AB" value="Edmonton"/>
+                <capital label="BC" value="Victoria"/>
+                <capital label="MB" value="Winnipeg"/>
+                <capital label="NB" value="Fredericton"/>
+            </Capitals>
+        </root>
+    </mx:XML>
+    <!-- Create an XMLListCollection representing the Tree nodes.
+            多个capitals.Capitals组成XMLList，因为Capitals里还nest了其他  child elements. -->
+    <mx:XMLListCollection id="capitalColl" source="{capitals.Capitals}"/>
+    <!-- When you use an XML-based data provider with a tree you must specify
+        the label field, even if it is "label".
+        The XML object includes the root, so you must set showRoot="false".
+        Remember that the Tree will not, by default, reflect dynamic changes 
+        to the XML object. -->
+    <mx:Tree id="Tree1" dataProvider="{capitals}" labelField="@label" showRoot="false" width="300"/>
+    <!-- The XMLListCollection does not include the XML root. -->
+    <mx:Tree id="Tree2" dataProvider="{capitalColl}" labelField="@label" width="300"/>
+</mx:Application>
