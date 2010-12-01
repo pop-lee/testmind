@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:Application xmlns:mx="http://www.adobe.com/2006/mxml" layout="absolute" width="100%" height="100%"
+    creationComplete="creaHandle()">
+    <mx:Script>
+        <![CDATA[
+            import model.MindModel;
+            import view.Node;
+            import library.map.IMap;
+            import library.map.HashMap;
+            
+            public static var mainNode : Node = new Node();
+            
+            private function creaHandle() : void
+            {
+                MindModel.getInstance().main = this;
+                test() ;
+            }
+            
+            private function test() : void
+            {
+                mainNode.x = this.width/2;
+                mainNode.y = this.height/2;
+                addChild(mainNode);
+                for each(var _xml : Object in xmllc) {
+                    createNode(_xml,mainNode);
+                }
+//                var node2 : Node = new Node();
+//                node2.parentNode = mainNode;
+//                var node3 : Node = new Node();
+//                node3.parentNode = mainNode;
+//                var node4 : Node = new Node();
+//                node4.parentNode = mainNode;
+//                var node5 : Node = new Node();
+//                node5.parentNode = node2;
+                
+//                addChild(node2);
+//                addChild(node3);
+//                addChild(node4);
+//                addChild(node5);
+            }
+            
+            private function createNode(obj : Object,_parentNode : Node) : void
+            {
+                if(obj.hasOwnProperty("node")) {
+                    
+                    for each(var _childNode : Object in obj.node) {
+                        var _node : Node = new Node();
+                        _node.parentNode = _parentNode;
+                        if(_childNode.hasOwnProperty("content"))
+                            _node.nodeContent = _childNode.content;
+                        addChild(_node);
+                        createNode(_childNode,_node);
+                    }
+                }
+            }
+            
+        ]]>
+    </mx:Script>
+    <mx:XML id="dp" source="/model/model001.xml" />
+    <mx:XMLListCollection id="xmllc" source="{dp.Nodes}" />
+    
+    <!--
+    <mx:Model id="dp" source="/model/model001.xml" />
+    <mx:XMLList id="dp" xmlns="/model/model001.xml" />
+    -->
+    
+    
+</mx:Application>

@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:Application xmlns:mx="http://www.adobe.com/2006/mxml" layout="vertical">
+    
+    <mx:Script>
+        <![CDATA[
+            import mx.collections.XMLListCollection;
+            import mx.collections.ArrayCollection;
+            // An XML object with categorized produce.
+            [Bindable]
+            public var myData:XML=
+                         <catalog>
+                             <category name="Meat">
+                                 <product name="Buffalo" cost="4" isOrganic="No"
+                                      isLowFat="Yes"/>
+                                 <product name="T Bone Steak" cost="6" isOrganic="No"
+                                      isLowFat="No"/>
+                                 <product name="Whole Chicken" cost="1.5" isOrganic="Yes"
+                                      isLowFat="No"/>
+                             </category>
+                             <category name="Vegetables">
+                                 <product name="Broccoli" cost="2.16" isOrganic="Yes"
+                                      isLowFat="Yes"/>
+                                 <product name="Vine Ripened Tomatoes" cost="1.69" isOrganic="No"
+                                      isLowFat="Yes"/>
+                                 <product name="Yellow Peppers" cost="1.25" isOrganic="Yes"
+                                      isLowFat="Yes"/>
+                             </category>
+                             <category name="Fruit">
+                                 <product name="Bananas" cost="0.95" isOrganic="Yes"
+                                      isLowFat="Yes"/>
+                                 <product name="Grapes" cost="1.34" isOrganic="No"
+                                      isLowFat="Yes" />
+                                 <product name="Strawberries" cost="2.5" isOrganic="Yes"
+                                      isLowFat="Yes"/>
+                             </category>
+                         </catalog>;
+             // An XMLListCollection representing the data for the shopping List.
+             [Bindable]
+             public var listDP:XMLListCollection = new XMLListCollection(new XMLList());
+             // Add the item selected in the Tree to the List XMLList data provider.
+             private function doTreeSelect():void
+             {
+                 if (prodTree.selectedItem)
+                     listDP.addItem(prodTree.selectedItem);
+             }
+            // Remove the selected in the List from the XMLList data provider.
+            private function doListRemove():void
+            {
+                if (prodList.selectedItem)
+                    listDP.removeItemAt(prodList.selectedIndex);
+            }
+        ]]>
+    </mx:Script>
+    <mx:Tree id="prodTree" dataProvider="{myData}" width="200"
+                showRoot="false" labelField="@name"/>
+    <mx:HBox>
+        <mx:Button id="treeSelect" label="Add to List"
+                        click="doTreeSelect()"/>
+        <mx:Button id="listRemove" label="Remove from List"
+                        click="doListRemove()"/>
+    </mx:HBox>
+    <mx:List id="prodList" dataProvider="{listDP}" width="200"
+                labelField="@name"/>
+</mx:Application>

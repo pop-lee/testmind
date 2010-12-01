@@ -1,0 +1,183 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:HBox xmlns:mx="http://www.adobe.com/2006/mxml" width="200" height="100"
+    creationComplete="creaHandle()" backgroundColor="0xffffff" backgroundAlpha="1" >
+    <mx:Script>
+        <![CDATA[
+            import model.MindModel;
+            import library.line.LinkLine;
+            import mx.events.CollectionEvent;
+            import mx.collections.ArrayCollection;
+            
+            private var mainModel : MindModel = MindModel.getInstance();
+            
+            [Bindable]
+            public var nodeContent : String = "";
+            
+            //线出端点
+            [Bindable]
+            private var _pointOut : Point = new Point();
+            //线入端点
+            [Bindable]
+            private var _pointIn : Point = new Point();
+            
+            //父端点
+//            [Bindable]
+            private var _parentNode : Node = null;
+            
+            //子端点
+            [Bindable]
+            private var _childNodes : ArrayCollection = new ArrayCollection() ;
+            
+            //子节点总空间
+            [Bindable]
+            private var _childNodesSpace : Number = 0;
+            
+            //端点级别
+            [Bindable]
+            private var _level : int = 0;
+            
+            //布局当前方向
+            private var _direction : String = "right";
+            
+            //布局标尺
+            private var _rule : Number = 0;
+            
+            //端点原占用空间
+            private var _nodeOldSpace : Number = 0;
+            
+            override public function set direction(_direction : String) : void
+            {
+                this._direction = _direction;
+            }
+            
+            //设置父节点
+            public function set parentNode(_parentNode : Node) : void
+            {
+                this._parentNode = _parentNode;
+                _parentNode.addChildNode(this);
+            }
+            
+            //节点占用空间
+            private function get nodeSpace() : Number
+            {
+                return (this.height > this._childNodesSpace ?
+                this.height : this._childNodesSpace);
+            }
+            
+            //添加子节点
+            public function addChildNode(_node : Node) : void
+            {
+                _node._level = _level+1;
+//                TestMindMap.levelPositionMap.put(
+
+                _node._nodeOldSpace = _node.height;
+                var _obj : Object = new Object();
+                var _linkLine : LinkLine = new LinkLine();
+                _obj.node = _node;
+                _obj.linkLine = _linkLine;
+                MindModel.getInstance().main.addChild(_obj.linkLine);
+                
+                this._childNodes.addItem(_obj);
+                
+                _childNodes.length>1? 
+                    childNodesSpace = _node.nodeSpace + mainModel.nodeSpacing:
+                    childNodesSpace = _node.nodeSpace
+                
+                refreshLine();
+            }
+            
+            //设置所有子节点占用空间大小
+            private function set childNodesSpace(_nodeSpace : Number) : void
+            {
+//                if(this.height > _childNodesSpace  + _nodeSpace) {
+                    _childNodesSpace = _childNodesSpace + _nodeSpace ;
+                    if(_parentNode != null)
+                        if(_childNodesSpace>height) {
+                            this._parentNode.childNodesSpace = _childNodesSpace-height;
+                        } else if(_childNodesSpace<=height&&_childNodesSpace-_nodeSpace>=height) {
+                            this._parentNode.childNodesSpace = height - (_childNodesSpace-_nodeSpace);
+                        }
+//                }
+            }
+            
+            private function creaHandle() : void
+            {
+//                _childNodesSpace = this.nodeSpace;
+            }
+            
+            //获取线段出口端点
+            private function get pointOut() : Point
+            {
+                _pointOut.x = this.x + this.width;
+                _pointOut.y = this.y + this.height/2;
+                return _pointOut;
+            }
+            
+            //获取线段入口端点
+            private function get pointIn()  : Point
+            {
+                _pointIn.x  = this.x ;
+                _pointIn.y  = this.y + this.height/2;
+                return _pointIn;
+            }
+            
+            //更改节点执行处罚
+            private function updateTextField() : void
+            {
+                this.width = content.textWidth + 10;
+                this.height = content.textHeight + 5;
+                
+                //当子节点占用空间变小
+                if(_parentNode != null&&this.height<_nodeOldSpace) {
+                    //如果当前节点高度大于当前节点的子节点空间
+                    if(this.height>_childNodesSpace) {
+                        this._parentNode.childNodesSpace = this.height - _nodeOldSpace;
+                    //如果当前节点原高度大于子节点占用空间,现在高度小于子节点占用空间
+                    } else if(_nodeOldSpace>_childNodesSpace&&this.height<_childNodesSpace) {
+                        this._parentNode.childNodesSpace = _nodeOldSpace - _childNodesSpace;
+                    }
+                    
+                }
+                _nodeOldSpace = this.height;
+                
+                TestMindMap.mainNode.refreshLine();
+            }
+            
+            public function updateUI() : void
+            {
+                
+//                if(_parentNode != null) {
+//                    this.x = this._parentNode.x + this._parentNode.width + TestMindMap.parentSpacing;
+//                    this.y = this._parentNode.y + this._parentNode.height/2 - this._parentNode._childNodesSpace/2 + this._parentNode._rule ;
+//                    _parentNode._rule = _parentNode._rule + this.height + TestMindMap.nodeSpacing;
+//                }
+//                _node.x = this.x + this.width + TestMindMap.parentSpacing;
+//                _node.y = this.y + this.height/2 - this._childNodesSpace/2 + _rule + _node.height/2;
+            }
+            
+            //作为父Node画线
+            private function refreshLine(event : CollectionEvent=null) : void
+            {
+                for each(var _obj : Object in _childNodes)
+                {
+                    _obj.node.x = this.x + this.width + mainModel.parentSpacing;
+                    _obj.node.y = this.y + this.height/2 - this.nodeSpace/2 + this._rule + _obj.node.nodeSpace/2 - _obj.node.height/2 ;
+                    _rule = _rule + _obj.node.nodeSpace + mainModel.nodeSpacing;
+                    
+                    
+                    (_obj.linkLine as LinkLine).startPoint = pointOut;
+                    
+                    (_obj.linkLine as LinkLine).endPoint = (_obj.node as Node).pointIn;
+//                    this.dispatchEvent(pointMove);
+                    (_obj.linkLine as LinkLine).drawLine();
+                    (_obj.node as Node).refreshLine();
+                }
+                _rule = 0;
+            }
+            
+        ]]>
+    </mx:Script>
+    <mx:TextInput id="content" width="100%" editable="false" alpha="0" text="{nodeContent}"
+        doubleClickEnabled="true" doubleClick="{content.editable= true}"
+        change="updateTextField()" />
+</mx:HBox>
