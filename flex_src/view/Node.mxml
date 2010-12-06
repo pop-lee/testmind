@@ -1,8 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <mx:HBox xmlns:mx="http://www.adobe.com/2006/mxml" width="200" height="100" 
-    mouseDown="dragSource(event,this,'node')"
-    dragEnter="dragEnter(event,'node')"
-    dragDrop="dragDrop(event,'node')"
+    mouseDown="mouseDownHandle(event)"
+    mouseMove="mouseMoveHandle(event)"
+    mouseUp="mouseUpHandle(event)"
+    mouseOver="mouseOverHandle(event)"
+    mouseOut="mouseOutHandle(event)" borderColor="0xff0000" borderStyle="none"
     creationComplete="creaHandle()" backgroundColor="0xffffff" backgroundAlpha="1" >
     <mx:Script source="NodeDrag.as" />
     <mx:Script>
@@ -94,7 +96,7 @@
                     childNodesSpace = _node.nodeSpace + mainModel.nodeSpacing:
                     childNodesSpace = _node.nodeSpace;
                 
-                refreshLine();
+                refresh();
             }
             
             //删除节点
@@ -115,7 +117,7 @@
                     _childNodesSpace = _childNodesSpace + _nodeSpace ;
                     if(_parentNode != null)
                         if(_childNodesSpace>height) {
-                            this._parentNode.childNodesSpace = _childNodesSpace-height;
+                            this._parentNode.childNodesSpace = _nodeSpace;
                         } else if(_childNodesSpace<=height&&_childNodesSpace-_nodeSpace>=height) {
                             this._parentNode.childNodesSpace = height - (_childNodesSpace-_nodeSpace);
                         }
@@ -182,7 +184,7 @@
             }
             
             //作为父Node画线
-            private function refreshLine(event : CollectionEvent=null) : void
+            public function refreshLine(event : CollectionEvent=null) : void
             {
                 for each(var _node : Node in _childNodes)
                 {

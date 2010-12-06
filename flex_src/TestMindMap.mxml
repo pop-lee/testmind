@@ -1,8 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <mx:Application xmlns:mx="http://www.adobe.com/2006/mxml" layout="absolute" width="100%" height="100%"
-    creationComplete="creaHandle()">
+    creationComplete="creaHandle()" 
+    
+    
+    >
     <mx:Script>
         <![CDATA[
+            import mx.core.UIComponent;
+            import mx.managers.DragManager;
+            import mx.events.DragEvent;
             import model.MindModel;
             import view.Node;
             
@@ -16,8 +22,8 @@
             
             private function test() : void
             {
-                mainNode.x = this.width/2;
-                mainNode.y = this.height/2;
+                mainNode.x = this.width/3;
+                mainNode.y = this.height/3;
                 addChild(mainNode);
                 for each(var _xml : Object in xmllc) {
                     createNode(_xml,mainNode);
@@ -51,6 +57,29 @@
                     }
                 }
             }
+            
+//            private function dragEnterHandle(event : DragEvent,format : String) : void
+//            {
+//                if(event.dragSource.hasFormat(format)) 
+//                    DragManager.acceptDragDrop(event.target as UIComponent);
+//            }
+//            
+//            private function dragDropHandle(event : DragEvent,format : String) : void
+//            {
+//                mainModel.dragNode = null;
+//                stopDrag();
+//            }
+            
+            private var mainModel : MindModel = MindModel.getInstance();
+            
+//            private function mouseMoveHandle(event : MouseEvent) : void
+//            {
+//                if(mainModel.dragNode != null) {
+//                    mainModel.dragNode.x = event.stageX - mainModel.dragNode.mouseX;
+//                    mainModel.dragNode.y = event.stageY - mainModel.dragNode.mouseY;
+//                    mainModel.dragNode.refreshLine();
+//                }
+//            }
             
         ]]>
     </mx:Script>

@@ -2,6 +2,8 @@ package model
 {
     import mx.core.Application;
     
+    import view.Node;
+    
     public class MindModel
     {
         [Bindable]
@@ -16,6 +18,10 @@ package model
         public var nodeSpacing : int = 20;
         
         public var main : Application ;
+        
+        public var dragNode : Node ;
+        
+        public var isDraging : Boolean = false;
         
         [Bindable]
         public var parentSpacing : int = 40;
