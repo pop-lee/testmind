@@ -61,18 +61,20 @@ private function mouseMoveHandle(event : MouseEvent) : void
 
 private function mouseUpHandle(event : MouseEvent) : void
 {
-    if(mainModel.dragNode.parentNode!=null)
-        if(this==mainModel.dragNode) {
-                mainModel.dragNode.parentNode.refreshLine();
-        } else {
-            mainModel.dragNode.parentNode.removeChildNode(mainModel.dragNode);
-            mainModel.dragNode.parentNode = this;
-        }
-    this.setStyle("backgroundAlpha",1);
-    this.setStyle("borderStyle","none");
-    mainModel.isDraging = false;
-    
-    stopDrag();
+    if(mainModel.isDraging) {
+        if(mainModel.dragNode.parentNode!=null)
+            if(this==mainModel.dragNode) {
+                    mainModel.dragNode.parentNode.refreshLine();
+            } else {
+                mainModel.dragNode.parentNode.removeChildNode(mainModel.dragNode);
+                mainModel.dragNode.parentNode = this;
+            }
+        this.setStyle("backgroundAlpha",1);
+        this.setStyle("borderStyle","none");
+        mainModel.isDraging = false;
+        mainModel.dragNode = null;
+        stopDrag();
+    }
 }
 
 private function mouseOverHandle(event : MouseEvent) :void

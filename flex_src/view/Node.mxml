@@ -116,11 +116,19 @@
 //                if(this.height > _childNodesSpace  + _nodeSpace) {
                     _childNodesSpace = _childNodesSpace + _nodeSpace ;
                     if(_parentNode != null)
-                        if(_childNodesSpace>height) {
-                            this._parentNode.childNodesSpace = _nodeSpace;
-                        } else if(_childNodesSpace<=height&&_childNodesSpace-_nodeSpace>=height) {
-                            this._parentNode.childNodesSpace = height - (_childNodesSpace-_nodeSpace);
+                        if(_nodeSpace > 0) { 
+                            if(_childNodesSpace - _nodeSpace < height&&_childNodesSpace > height)
+                                this._parentNode.childNodesSpace = _childNodesSpace - height;
+                            else if(_childNodesSpace - _nodeSpace >= height)
+                                this._parentNode.childNodesSpace = _nodeSpace
+                        } else {
+                            if(_childNodesSpace>=height) {
+                                this._parentNode.childNodesSpace = _nodeSpace;
+                            } else if(_childNodesSpace<height&&_childNodesSpace-_nodeSpace>height) {
+                                this._parentNode.childNodesSpace = height - (_childNodesSpace-_nodeSpace);
+                            }
                         }
+                        
 //                }
             }
             
@@ -149,19 +157,25 @@
             private function updateTextField() : void
             {
                 this.width = content.textWidth + 10;
-                this.height = content.textHeight + 5;
+                this.height = content.textHeight + 10;
                 
-                //当子节点占用空间变小
-                if(_parentNode != null&&this.height<_nodeOldSpace) {
-                    //如果当前节点高度大于当前节点的子节点空间
-                    if(this.height>_childNodesSpace) {
-                        this._parentNode.childNodesSpace = this.height - _nodeOldSpace;
-                    //如果当前节点原高度大于子节点占用空间,现在高度小于子节点占用空间
-                    } else if(_nodeOldSpace>_childNodesSpace&&this.height<_childNodesSpace) {
-                        this._parentNode.childNodesSpace = _nodeOldSpace - _childNodesSpace;
+                if(_parentNode != null)
+                    //当子节点占用空间变小
+                    if(this.height<_nodeOldSpace) {
+                        //如果当前节点高度大于当前节点的子节点空间
+                        if(this.height>=_childNodesSpace) {
+                            this._parentNode.childNodesSpace = this.height - _nodeOldSpace;
+                        //如果当前节点原高度大于子节点占用空间,现在高度小于子节点占用空间
+                        } else if(_nodeOldSpace>_childNodesSpace&&this.height<_childNodesSpace) {
+                            this._parentNode.childNodesSpace = _nodeOldSpace - _childNodesSpace;
+                        }
+                    } else {
+                        if(_nodeOldSpace>=_childNodesSpace) {
+                            this._parentNode.childNodesSpace = this.height - _nodeOldSpace;
+                        } else if(_nodeOldSpace<_childNodesSpace&&this.height>_childNodesSpace) {
+                            this._parentNode.childNodesSpace = this.height - _childNodesSpace;
+                        }
                     }
-                    
-                }
                 _nodeOldSpace = this.height;
                 refresh();
             }
@@ -186,10 +200,13 @@
             //作为父Node画线
             public function refreshLine(event : CollectionEvent=null) : void
             {
+                    
+                _rule = -_childNodesSpace/2;
+                    
                 for each(var _node : Node in _childNodes)
                 {
                     _node.x = this.x + this.width + mainModel.parentSpacing;
-                    _node.y = this.y + this.height/2 - this.nodeSpace/2 + this._rule + _node.nodeSpace/2 - _node.height/2 ;
+                    _node.y = this.y + this.height/2 + this._rule + _node.nodeSpace/2 - _node.height/2 ;
                     _rule = _rule + _node.nodeSpace + mainModel.nodeSpacing;
                     
                     
@@ -205,7 +222,7 @@
             
         ]]>
     </mx:Script>
-    <mx:TextInput id="content" width="100%" editable="false" alpha="0" text="{nodeContent}"
+    <mx:TextInput id="content" width="100%" height="100%" editable="false" alpha="0" text="{nodeContent}"
         doubleClickEnabled="true" doubleClick="{content.editable= true}"
         change="updateTextField()" />
 </mx:HBox>
