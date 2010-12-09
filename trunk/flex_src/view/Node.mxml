@@ -1,14 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
-<mx:HBox xmlns:mx="http://www.adobe.com/2006/mxml" width="200" height="100" 
+<mx:HBox xmlns:mx="http://www.adobe.com/2006/mxml" width="100" height="30" 
+    paddingTop="0" paddingBottom="0"
     mouseDown="mouseDownHandle(event)"
     mouseMove="mouseMoveHandle(event)"
     mouseUp="mouseUpHandle(event)"
     mouseOver="mouseOverHandle(event)"
-    mouseOut="mouseOutHandle(event)" borderColor="0xff0000" borderStyle="none"
+    mouseOut="mouseOutHandle(event)" 
+    borderColor="0xff0000" borderStyle="none"
+    horizontalScrollPolicy="off" verticalScrollPolicy="off"
     creationComplete="creaHandle()" backgroundColor="0xffffff" backgroundAlpha="1" >
     <mx:Script source="NodeDrag.as" />
+    <mx:Script source="NodeMouse.as" />
+    <mx:Script source="NodeFocus.as" />
     <mx:Script>
         <![CDATA[
+            import mx.core.Application;
+            import flash.debugger.enterDebugger;
             import model.MindModel;
             import library.line.LinkLine;
             import mx.events.CollectionEvent;
@@ -156,8 +163,10 @@
             //更改节点执行处罚
             private function updateTextField() : void
             {
-                this.width = content.textWidth + 10;
-                this.height = content.textHeight + 10;
+                this.width = content.width = content.textWidth + this.getStyle("fontSize")*3;
+                this.height = content.height = content.textHeight + 10;
+                content.text = content.text;
+                content.horizontalScrollPosition = 0;
                 
                 if(_parentNode != null)
                     //当子节点占用空间变小
@@ -200,7 +209,6 @@
             //作为父Node画线
             public function refreshLine(event : CollectionEvent=null) : void
             {
-                    
                 _rule = -_childNodesSpace/2;
                     
                 for each(var _node : Node in _childNodes)
@@ -222,7 +230,9 @@
             
         ]]>
     </mx:Script>
-    <mx:TextInput id="content" width="100%" height="100%" editable="false" alpha="0" text="{nodeContent}"
-        doubleClickEnabled="true" doubleClick="{content.editable= true}"
-        change="updateTextField()" />
+    <mx:TextArea id="content" editable="false" text="{nodeContent}" width="100%" height="100%"
+        doubleClickEnabled="true" doubleClick="{content.editable= true}" 
+        change="updateTextField()" wordWrap="false" textAlign="center" 
+        horizontalScrollPolicy="off"
+        focusIn="focusInHandle()" focusOut="focusOutHandle()" />
 </mx:HBox>
