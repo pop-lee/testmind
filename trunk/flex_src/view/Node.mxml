@@ -1,14 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <mx:HBox xmlns:mx="http://www.adobe.com/2006/mxml" width="100" height="30" 
-    paddingTop="0" paddingBottom="0"
+    paddingTop="0" paddingBottom="0" 
     mouseDown="mouseDownHandle(event)"
     mouseMove="mouseMoveHandle(event)"
     mouseUp="mouseUpHandle(event)"
     mouseOver="mouseOverHandle(event)"
     mouseOut="mouseOutHandle(event)" 
+    creationComplete="creaHandle()" 
     borderColor="0xff0000" borderStyle="none"
     horizontalScrollPolicy="off" verticalScrollPolicy="off"
-    creationComplete="creaHandle()" backgroundColor="0xffffff" backgroundAlpha="1" >
+    backgroundColor="0xffffff" backgroundAlpha="1" >
     <mx:Script source="NodeDrag.as" />
     <mx:Script source="NodeMouse.as" />
     <mx:Script source="NodeFocus.as" />
@@ -59,6 +60,8 @@
             
             //端点原占用空间
             private var _nodeOldSpace : Number = 0;
+            
+            public var isEditable : Boolean = false;
             
             override public function set direction(_direction : String) : void
             {
@@ -164,7 +167,7 @@
             private function updateTextField() : void
             {
                 this.width = content.width = content.textWidth + this.getStyle("fontSize")*3;
-                this.height = content.height = content.textHeight + 10;
+                this.height = content.height = content.textHeight + 15;
                 content.text = content.text;
                 content.horizontalScrollPosition = 0;
                 
@@ -230,9 +233,10 @@
             
         ]]>
     </mx:Script>
-    <mx:TextArea id="content" editable="false" text="{nodeContent}" width="100%" height="100%"
-        doubleClickEnabled="true" doubleClick="{content.editable= true}" 
-        change="updateTextField()" wordWrap="false" textAlign="center" 
+    <mx:TextArea id="content" editable="true" text="{nodeContent}" width="100%" height="100%"
+        paddingTop="5" creationComplete="updateTextField()"
+        doubleClickEnabled="true" doubleClick="{this.isEditable = content.editable = true}" backgroundAlpha="0"
+        change="updateTextField()" wordWrap="false" textAlign="center"
         horizontalScrollPolicy="off"
         focusIn="focusInHandle()" focusOut="focusOutHandle()" />
 </mx:HBox>
