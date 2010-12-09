@@ -1,3 +1,4 @@
+
 package model
 {
     import mx.core.Application;
@@ -20,6 +21,8 @@ package model
         public var main : Application ;
         
         public var dragNode : Node ;
+        
+        public var focusNode : Node ;
         
         public var isDraging : Boolean = false;
         

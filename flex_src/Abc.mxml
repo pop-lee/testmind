@@ -61,4 +61,5 @@
     </mx:HBox>
     <mx:List id="prodList" dataProvider="{listDP}" width="200"
                 labelField="@name"/>
+    <mx:TextArea backgroundAlpha="1" backgroundColor="0x0000ff" />
 </mx:Application>
