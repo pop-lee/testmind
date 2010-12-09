@@ -13,6 +13,7 @@
     <mx:Script source="NodeDrag.as" />
     <mx:Script source="NodeMouse.as" />
     <mx:Script source="NodeFocus.as" />
+    <mx:Script source="NodeKeyboard.as" />
     <mx:Script>
         <![CDATA[
             import mx.core.Application;
@@ -61,6 +62,8 @@
             //端点原占用空间
             private var _nodeOldSpace : Number = 0;
             
+            //当前节点是否可编辑
+            [Bindable]
             public var isEditable : Boolean = false;
             
             override public function set direction(_direction : String) : void
@@ -166,8 +169,8 @@
             //更改节点执行处罚
             private function updateTextField() : void
             {
-                this.width = content.width = content.textWidth + this.getStyle("fontSize")*3;
-                this.height = content.height = content.textHeight + 15;
+                this.width = content.width = (content.textWidth==0?30:content.textWidth) + this.getStyle("fontSize")*3;
+                this.height = content.height = (content.textHeight==0?13:content.textHeight) + 15;
                 content.text = content.text;
                 content.horizontalScrollPosition = 0;
                 
@@ -233,10 +236,11 @@
             
         ]]>
     </mx:Script>
-    <mx:TextArea id="content" editable="true" text="{nodeContent}" width="100%" height="100%"
-        paddingTop="5" creationComplete="updateTextField()"
-        doubleClickEnabled="true" doubleClick="{this.isEditable = content.editable = true}" backgroundAlpha="0"
+    <mx:TextArea id="content" editable="{isEditable}" selectable="{isEditable}" text="{nodeContent}" width="100%" height="100%"
+        paddingTop="5" creationComplete="updateTextField()" keyUp="keyUpHandle(event)" keyDown="keyDownHandle(event)"
+        textInput="textInputHandle(event)"
+        doubleClickEnabled="true" doubleClick="{this.isEditable = true}" backgroundAlpha="0"
         change="updateTextField()" wordWrap="false" textAlign="center"
         horizontalScrollPolicy="off"
-        focusIn="focusInHandle()" focusOut="focusOutHandle()" />
+        focusOut="focusOutHandle()" />
 </mx:HBox>
