@@ -11,12 +11,13 @@ public function setFocusNode() : void
     this.setStyle("backgroundColor",0x66ccff);
 }
 
-private function focusInHandle() : void
-{
-//    isFocusIn = true;
-}
+//private function focusInHandle() : void
+//{
+////    isFocusIn = true;
+//}
 private function focusOutHandle() : void
 {
 //    isFocusIn = false;
-    content.editable = this.isEditable = false;
+    if(mainModel.focusNode != this)
+        this.isEditable = false;
 }

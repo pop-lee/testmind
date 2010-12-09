@@ -1,11 +1,13 @@
 // ActionScript file
 private function mouseDownHandle(event : MouseEvent) : void
 {
-    setFocusNode();
-    Application.application.setChildIndex(this,0);
-    mainModel.dragNode = this;
-    mainModel.isDraging = true;
-    startDrag();
+    if(!isEditable) {
+        setFocusNode();
+        Application.application.setChildIndex(this,0);
+        mainModel.dragNode = this;
+        mainModel.isDraging = true;
+        startDrag();
+    }
 }
 
 private function mouseMoveHandle(event : MouseEvent) : void
