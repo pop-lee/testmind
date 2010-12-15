@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<mx:HBox xmlns:mx="http://www.adobe.com/2006/mxml" width="100" height="30" 
+<mx:HBox xmlns:mx="http://www.adobe.com/2006/mxml" width="120" height="30" 
+    horizontalGap="0" 
     paddingTop="0" paddingBottom="0" 
     mouseDown="mouseDownHandle(event)"
     mouseMove="mouseMoveHandle(event)"
@@ -48,6 +49,10 @@
             //子节点总空间
             [Bindable]
             private var _childNodesSpace : Number = 0;
+            
+            private var _expandNodesSpace : Number = 0;
+            
+            private var _isExpanding : Boolean = false;
             
             //端点级别
             [Bindable]
@@ -169,8 +174,8 @@
             //更改节点执行处罚
             private function updateTextField() : void
             {
-                this.width = content.width = (content.textWidth==0?30:content.textWidth) + this.getStyle("fontSize")*3;
-                this.height = content.height = (content.textHeight==0?13:content.textHeight) + 15;
+                this.width = content.percentWidth = (content.textWidth==0?30:content.textWidth) + this.getStyle("fontSize")*3;
+                this.height = content.percentHeight = (content.textHeight==0?13:content.textHeight) + 15;
                 content.text = content.text;
                 content.horizontalScrollPosition = 0;
                 
@@ -193,6 +198,15 @@
                     }
                 _nodeOldSpace = this.height;
                 refresh();
+            }
+            
+            private function hideNodeHandle(_childNodes : ArrayCollection,_isHiden : Boolean) : void
+            {
+                for each(var _node : Node in _childNodes) {
+                    _node.visible = _isHiden;
+                    _node._linkLine.visible = _isHiden;
+                    hideNodeHandle(_node._childNodes,_isHiden);
+                }
             }
             
             private function refresh() : void
@@ -243,4 +257,5 @@
         change="updateTextField()" wordWrap="false" textAlign="center"
         horizontalScrollPolicy="off"
         focusOut="focusOutHandle()" />
+    <mx:LinkButton label="+" click="expandNodeHandle()" width="15" height="90%" />
 </mx:HBox>

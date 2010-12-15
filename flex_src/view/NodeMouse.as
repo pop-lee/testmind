@@ -1,4 +1,6 @@
 // ActionScript file
+import view.Node;
+
 private function mouseDownHandle(event : MouseEvent) : void
 {
     if(!isEditable) {
@@ -48,4 +50,18 @@ private function mouseOutHandle(event : MouseEvent) : void
 {
     this.setStyle("backgroundAlpha",1);
     this.setStyle("borderStyle","none");
+}
+
+private function expandNodeHandle() : void
+{
+    if(_isExpanding) {
+        _expandNodesSpace = _childNodesSpace;
+        childNodesSpace = -_expandNodesSpace;
+        _isExpanding = false;
+    } else {
+        childNodesSpace = _expandNodesSpace;
+        _isExpanding = true;
+    }
+    hideNodeHandle(_childNodes,_isExpanding);
+    refresh();
 }

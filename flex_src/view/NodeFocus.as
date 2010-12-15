@@ -7,7 +7,12 @@ public function setFocusNode() : void
     if(mainModel.focusNode != null&&mainModel.focusNode!=this) 
         mainModel.focusNode.setStyle("backgroundColor",0xffffff);
     mainModel.focusNode = this;
-    this.setFocus();
+    if(isEditable) {
+        content.setFocus();
+    }
+    else {
+        this.setFocus();
+    } 
     this.setStyle("backgroundColor",0x66ccff);
 }
 

@@ -12,7 +12,7 @@ private function keyDownHandle(event : KeyboardEvent) : void
 
 private function keyUpHandle(event : KeyboardEvent) : void
 {
-    if(mainModel.focusNode == this) {
+    if(mainModel.focusNode == this&&this.isEditable) {
         if(event.ctrlKey&&event.keyCode == 13) {
             event.stopPropagation();
             this.isEditable = false;
