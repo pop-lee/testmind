@@ -203,8 +203,8 @@
             private function hideNodeHandle(_childNodes : ArrayCollection,_isHiden : Boolean) : void
             {
                 for each(var _node : Node in _childNodes) {
-                        _node.visible = _isHiden;
-                        _node._linkLine.visible = _isHiden;
+                        _node.visible = _node.includeInLayout = _isHiden;
+                        _node._linkLine.visible = _node._linkLine.includeInLayout = _isHiden;
                     if(_node._isExpanding) 
                         hideNodeHandle(_node._childNodes,_isHiden);
                 }
