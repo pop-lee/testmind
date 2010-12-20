@@ -1,4 +1,6 @@
 // ActionScript file
+import mx.managers.FocusManager;
+
 
 public var isFocusIn : Boolean = false;
 
@@ -23,6 +25,6 @@ public function setFocusNode() : void
 private function focusOutHandle() : void
 {
 //    isFocusIn = false;
-    if(mainModel.focusNode != this)
+//    if(mainModel.focusNode != this)
         this.isEditable = false;
 }

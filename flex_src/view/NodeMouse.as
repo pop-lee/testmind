@@ -54,6 +54,7 @@ private function mouseOutHandle(event : MouseEvent) : void
 
 private function expandNodeHandle() : void
 {
+    if(_childNodes.length == 0) return;
     if(_isExpanding) {
         _expandNodesSpace = _childNodesSpace;
         childNodesSpace = -_expandNodesSpace;
