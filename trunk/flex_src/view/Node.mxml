@@ -52,7 +52,7 @@
             
             private var _expandNodesSpace : Number = 0;
             
-            private var _isExpanding : Boolean = false;
+            private var _isExpanding : Boolean = true;
             
             //端点级别
             [Bindable]
@@ -203,9 +203,10 @@
             private function hideNodeHandle(_childNodes : ArrayCollection,_isHiden : Boolean) : void
             {
                 for each(var _node : Node in _childNodes) {
-                    _node.visible = _isHiden;
-                    _node._linkLine.visible = _isHiden;
-                    hideNodeHandle(_node._childNodes,_isHiden);
+                        _node.visible = _isHiden;
+                        _node._linkLine.visible = _isHiden;
+                    if(_node._isExpanding) 
+                        hideNodeHandle(_node._childNodes,_isHiden);
                 }
             }
             
