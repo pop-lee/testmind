@@ -75,6 +75,10 @@
             {
                 this._direction = _direction;
             }
+//            override public function get direction():String
+//            {
+//                return _direction;
+//            }
             
             //设置父节点
             public function set parentNode(_parentNode : Node) : void
@@ -171,7 +175,7 @@
                 return _pointIn;
             }
             
-            //更改节点执行处罚
+            //更改节点执行触发
             private function updateTextField() : void
             {
                 this.width = content.percentWidth = (content.textWidth==0?30:content.textWidth) + this.getStyle("fontSize")*3;
@@ -200,6 +204,7 @@
                 refresh();
             }
             
+            //隐藏节点执行
             private function hideNodeHandle(_childNodes : ArrayCollection,_isHiden : Boolean) : void
             {
                 for each(var _node : Node in _childNodes) {
