@@ -27,7 +27,7 @@
             {
                 mainNode.x = this.width/3;
                 mainNode.y = this.height/3;
-                mainNode.direction = "middle";
+//                mainNode.direction = "middle";
                 mainNode.setFocusNode();
                 addChild(mainNode);
                 for each(var _xml : Object in xmllc) {
@@ -54,11 +54,11 @@
                     
                     for each(var _childNode : Object in obj.node) {
                         var _node : Node = new Node();
-                        _node.parentNode = _parentNode;
                         if(_childNode.hasOwnProperty("content"))
                             _node.nodeContent = _childNode.content;
-                        if(_childNode.hasOwnProperty("direction"))
+                        if(_childNode.hasOwnProperty("direction")) 
                             _node.direction = _childNode.direction;
+                        _node.parentNode = _parentNode;
                         addChild(_node);
                         createNode(_childNode,_node);
                     }

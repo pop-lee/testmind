@@ -17,12 +17,15 @@
     <mx:Script source="NodeKeyboard.as" />
     <mx:Script>
         <![CDATA[
-            import mx.core.Application;
             import flash.debugger.enterDebugger;
-            import model.MindModel;
+            
             import library.line.LinkLine;
-            import mx.events.CollectionEvent;
+            
+            import model.MindModel;
+            
             import mx.collections.ArrayCollection;
+            import mx.core.Application;
+            import mx.events.CollectionEvent;
             
             private var mainModel : MindModel = MindModel.getInstance();
             
@@ -44,13 +47,16 @@
             
             //子端点
             [Bindable]
-            private var _childNodes : ArrayCollection = new ArrayCollection() ;
+            private var _rightChildNodes : ArrayCollection = new ArrayCollection() ;
+			private var _leftChildNodes : ArrayCollection = new ArrayCollection();
             
             //子节点总空间
             [Bindable]
-            private var _childNodesSpace : Number = 0;
-            
+            private var _rightChildNodesSpace : Number = 0;
+			private var _leftChildNodesSpace : Number = 0;
+			
             private var _expandNodesSpace : Number = 0;
+			private var _leftExpandNodesSpace : Number = 0;
             
             private var _isExpanding : Boolean = true;
             
@@ -60,9 +66,11 @@
             
             //布局当前方向
             private var _direction : String = "right";
+			private var _dirFlag : String = "right" ;
             
             //布局标尺
-            private var _rule : Number = 0;
+            private var _rRule : Number = 0;
+			private var _lRule : Number = 0;
             
             //端点原占用空间
             private var _nodeOldSpace : Number = 0;
@@ -73,13 +81,59 @@
             
             override public function set direction(_direction : String) : void
             {
-                this._direction = _direction;
+				_dirFlag = this._direction = _direction;
             }
-//            override public function get direction():String
-//            {
-//                return _direction;
-//            }
+			override public function get direction():String
+			{
+//				if(_parentNode._parentNode == null)
+					return _direction;
+//				else 
+//					return _direction = _parentNode._direction;
+			}
+			private function getExpandNodesSpace(_direction : String) : Number
+			{
+				if(_direction == "right")
+					return _expandNodesSpace;
+				else if(_direction == "left")
+					return _leftExpandNodesSpace;
+				else
+					throw new Error("this Node not hav direction!");
+			}
+			private function setExpandNodesSpace(_expandNodesSpace : Number , _direction : String) : void
+			{
+				if(_direction == "right")
+					_expandNodesSpace = _expandNodesSpace;
+				else if(_direction == "left")
+					_leftExpandNodesSpace = _expandNodesSpace;
+			}
             
+            private function getChildNodesSpace(_direction : String) : Number
+			{
+				if(_direction == "right")
+					return _rightChildNodesSpace;
+				else if(_direction == "left")
+					return _leftChildNodesSpace;
+				else
+					throw new Error("this Node not hav direction!");
+			}
+			private function setChildNodesSpace(_childNodesSpace : Number,_direction : String) : void
+			{
+				if(_direction == "right")
+					_rightChildNodesSpace = _childNodesSpace;
+				else if(_direction == "left")
+					_leftChildNodesSpace = _childNodesSpace;
+			}
+			
+			private function getChildNodes(_direction : String) : ArrayCollection
+			{
+				if(_direction == "right")
+					return _rightChildNodes
+				else if(_direction == "left")
+					return _leftChildNodes;
+				else
+					throw new Error("this Node not hav direction!");
+			}
+			
             //设置父节点
             public function set parentNode(_parentNode : Node) : void
             {
@@ -94,12 +148,11 @@
             //节点占用空间
             private function get nodeSpace() : Number
             {
-                return (this.height > this._childNodesSpace ?
-                this.height : this._childNodesSpace);
+            	return (this.height > this.getChildNodesSpace(_direction)?this.height : this.getChildNodesSpace(_direction));
             }
             
             //添加子节点
-            public function addChildNode(_node : Node) : void
+            private function addChildNode(_node : Node) : void
             {
                 _node._level = _level+1;
 //                TestMindMap.levelPositionMap.put(
@@ -112,42 +165,66 @@
 //                MindModel.getInstance().main.addChild(_obj.linkLine);
                 MindModel.getInstance().main.addChild(_node._linkLine);
                 
-                this._childNodes.addItem(_node);
+				if(_node._direction!=_node._dirFlag) {
+					changeDir(_node);
+				}
+				getChildNodes(_node.direction).addItem(_node);
                 
-                _childNodes.length>1? 
-                    childNodesSpace = _node.nodeSpace + mainModel.nodeSpacing:
-                    childNodesSpace = _node.nodeSpace;
+				getChildNodes(_node.direction).length>1? 
+					changeChildNodesSpace(_node.nodeSpace + mainModel.nodeSpacing,_node.direction):
+					changeChildNodesSpace(_node.nodeSpace,_node.direction);
                 
                 refresh();
             }
+			
+			private function changeDir(_node : Node) : void
+			{
+				if(_node._direction == "right") {
+					_node.getChildNodes("left").addAll(_node.getChildNodes("right"));
+					_node.getChildNodes("right").removeAll();
+					_node.setChildNodesSpace(_node.getChildNodesSpace("right"),"left");
+					_node.setChildNodesSpace(0,"right");
+					_node.direction = "left";
+				} else if(_node._direction == "left") {
+					_node.getChildNodes("right").addAll(_node.getChildNodes("left"));
+					_node.getChildNodes("left").removeAll();
+					_node.setChildNodesSpace(_node.getChildNodesSpace("left"),"right");
+					_node.setChildNodesSpace(0,"left");
+					_node.direction = "right";
+				}
+				for each(var _tempNode : Node in _node.getChildNodes(_node._direction)) {
+					changeDir(_tempNode);
+				}
+			}
             
             //删除节点
             public function removeChildNode(_node : Node) : void
             {
-                _childNodes.length>1?
-                childNodesSpace = 0 - _node.nodeSpace - mainModel.nodeSpacing:
-                childNodesSpace = 0 - _node.nodeSpace;
+				getChildNodes(_node._direction).length>1?
+					changeChildNodesSpace(0 - _node.nodeSpace - mainModel.nodeSpacing,_node._direction):
+					changeChildNodesSpace(0 - _node.nodeSpace,_node._direction);
                 
-                _childNodes.removeItemAt(_childNodes.getItemIndex(_node));
+				getChildNodes(_node._direction).removeItemAt(getChildNodes(_node._direction).getItemIndex(_node));
                 refresh();
             }
             
             //设置所有子节点占用空间大小
-            private function set childNodesSpace(_nodeSpace : Number) : void
+            private function changeChildNodesSpace(_nodeSpace : Number,_direction : String) : void
             {
 //                if(this.height > _childNodesSpace  + _nodeSpace) {
-                    _childNodesSpace = _childNodesSpace + _nodeSpace ;
+					setChildNodesSpace(getChildNodesSpace(_direction) + _nodeSpace,_direction);
+					var thisChildNodesSpace : Number = getChildNodesSpace(_direction);
                     if(_parentNode != null)
                         if(_nodeSpace > 0) { 
-                            if(_childNodesSpace - _nodeSpace < height&&_childNodesSpace > height)
-                                this._parentNode.childNodesSpace = _childNodesSpace - height;
-                            else if(_childNodesSpace - _nodeSpace >= height)
-                                this._parentNode.childNodesSpace = _nodeSpace
+                            if(thisChildNodesSpace - _nodeSpace < height&&thisChildNodesSpace > height)
+                                this._parentNode.changeChildNodesSpace(thisChildNodesSpace - height,_direction);
+                            else if(thisChildNodesSpace - _nodeSpace >= height)
+                                this._parentNode.changeChildNodesSpace(_nodeSpace,_direction);
                         } else {
-                            if(_childNodesSpace>=height) {
-                                this._parentNode.childNodesSpace = _nodeSpace;
-                            } else if(_childNodesSpace<height&&_childNodesSpace-_nodeSpace>height) {
-                                this._parentNode.childNodesSpace = height - (_childNodesSpace-_nodeSpace);
+                            if(thisChildNodesSpace>=height) {
+                                this._parentNode.changeChildNodesSpace(_nodeSpace,_direction);
+                            } else if(thisChildNodesSpace<height&&thisChildNodesSpace-_nodeSpace>height) {
+                                this._parentNode.changeChildNodesSpace(height - (thisChildNodesSpace-_nodeSpace),_direction);
                             }
                         }
                         
@@ -160,44 +237,60 @@
             }
             
             //获取线段出口端点
-            private function get pointOut() : Point
+            private function getPointOut(_direction : String) : Point
             {
-                _pointOut.x = this.x + this.width;
-                _pointOut.y = this.y + this.height/2;
+				if(_direction == "right") {
+	                _pointOut.x = this.x + this.width;
+	                _pointOut.y = this.y + this.height/2;
+				}
+				if(_direction == "left") {
+					_pointOut.x = this.x;
+					_pointOut.y = this.y + this.height/2;
+				}
                 return _pointOut;
             }
             
             //获取线段入口端点
-            private function get pointIn()  : Point
+            private function getPointIn()  : Point
             {
-                _pointIn.x  = this.x ;
-                _pointIn.y  = this.y + this.height/2;
+				if(_direction == "right") {
+	                _pointIn.x  = this.x ;
+	                _pointIn.y  = this.y + this.height/2;
+				}
+				if(_direction == "left") {
+					_pointIn.x  = this.x + this.width;
+					_pointIn.y  = this.y + this.height/2;
+				}
                 return _pointIn;
             }
             
             //更改节点执行触发
             private function updateTextField() : void
             {
-                this.width = content.percentWidth = (content.textWidth==0?30:content.textWidth) + this.getStyle("fontSize")*3;
-                this.height = content.percentHeight = (content.textHeight==0?13:content.textHeight) + 15;
+                content.width = (content.textWidth==0?30:content.textWidth) + this.getStyle("fontSize")*3;
+                content.height = (content.textHeight==0?13:content.textHeight) + 15;
+				this.width = content.width + PButton.width;
+//				this.height = content.height + PButton.height;
+				
                 content.text = content.text;
                 content.horizontalScrollPosition = 0;
                 
+				var thisChildNodesSpace : Number = getChildNodesSpace(_direction);
                 if(_parentNode != null)
                     //当子节点占用空间变小
                     if(this.height<_nodeOldSpace) {
                         //如果当前节点高度大于当前节点的子节点空间
-                        if(this.height>=_childNodesSpace) {
-                            this._parentNode.childNodesSpace = this.height - _nodeOldSpace;
+                        if(this.height>=thisChildNodesSpace) {
+                            this._parentNode.changeChildNodesSpace(this.height - _nodeOldSpace,_direction);
                         //如果当前节点原高度大于子节点占用空间,现在高度小于子节点占用空间
-                        } else if(_nodeOldSpace>_childNodesSpace&&this.height<_childNodesSpace) {
-                            this._parentNode.childNodesSpace = _nodeOldSpace - _childNodesSpace;
+                        } else if(_nodeOldSpace>thisChildNodesSpace&&this.height<thisChildNodesSpace) {
+                            this._parentNode.changeChildNodesSpace(_nodeOldSpace - thisChildNodesSpace,_direction);
                         }
                     } else {
-                        if(_nodeOldSpace>=_childNodesSpace) {
-                            this._parentNode.childNodesSpace = this.height - _nodeOldSpace;
-                        } else if(_nodeOldSpace<_childNodesSpace&&this.height>_childNodesSpace) {
-                            this._parentNode.childNodesSpace = this.height - _childNodesSpace;
+                        if(_nodeOldSpace>=thisChildNodesSpace) {
+                            this._parentNode.changeChildNodesSpace(this.height - _nodeOldSpace,_direction);
+                        } else if(_nodeOldSpace<thisChildNodesSpace&&this.height>thisChildNodesSpace) {
+                            this._parentNode.changeChildNodesSpace(this.height - thisChildNodesSpace,_direction);
                         }
                     }
                 _nodeOldSpace = this.height;
@@ -211,7 +304,7 @@
                         _node.visible = _node.includeInLayout = _isHiden;
                         _node._linkLine.visible = _node._linkLine.includeInLayout = _isHiden;
                     if(_node._isExpanding) 
-                        hideNodeHandle(_node._childNodes,_isHiden);
+                        hideNodeHandle(_node.getChildNodes(_node._direction),_isHiden);
                 }
             }
             
@@ -235,23 +328,35 @@
             //作为父Node画线
             public function refreshLine(event : CollectionEvent=null) : void
             {
-                _rule = -_childNodesSpace/2;
-                    
-                for each(var _node : Node in _childNodes)
+				_lRule = -_leftChildNodesSpace/2;
+                _rRule = -_rightChildNodesSpace/2;
+                for each(var _rNode : Node in _rightChildNodes)
                 {
-                    _node.x = this.x + this.width + mainModel.parentSpacing;
-                    _node.y = this.y + this.height/2 + this._rule + _node.nodeSpace/2 - _node.height/2 ;
-                    _rule = _rule + _node.nodeSpace + mainModel.nodeSpacing;
+                    _rNode.x = this.x + this.width + mainModel.parentSpacing;
+                    _rNode.y = this.y + this.height/2 + this._rRule + _rNode.nodeSpace/2 - _rNode.height/2 ;
+                    _rRule = _rRule + _rNode.nodeSpace + mainModel.nodeSpacing;
                     
+                    _rNode._linkLine.startPoint = getPointOut(_rNode._direction);
                     
-                    _node._linkLine.startPoint = pointOut;
-                    
-                    _node._linkLine.endPoint = _node.pointIn;
+                    _rNode._linkLine.endPoint = _rNode.getPointIn();
 //                    this.dispatchEvent(pointMove);
-                    _node._linkLine.drawLine();
-                    _node.refreshLine();
+                    _rNode._linkLine.drawLine();
+                    _rNode.refreshLine();
+				}
+				_rRule = 0;
+				for each(var _lNode : Node in _leftChildNodes) {
+					_lNode.x = this.x - _lNode.width - mainModel.parentSpacing;
+					_lNode.y = this.y + this.height/2 + this._lRule + _lNode.nodeSpace/2 - _lNode.height/2 ;
+					_lRule = _lRule + _lNode.nodeSpace + mainModel.nodeSpacing;
+					
+					_lNode._linkLine.startPoint = getPointOut(_lNode._direction);
+					
+					_lNode._linkLine.endPoint = _lNode.getPointIn();
+//                    this.dispatchEvent(pointMove);
+					_lNode._linkLine.drawLine();
+					_lNode.refreshLine();
                 }
-                _rule = 0;
+                _lRule = 0;
             }
             
         ]]>
@@ -263,5 +368,5 @@
         change="updateTextField()" wordWrap="false" textAlign="center"
         horizontalScrollPolicy="off"
         focusOut="focusOutHandle()" />
-    <mx:LinkButton label="+" click="expandNodeHandle()" width="15" height="90%" />
+    <mx:LinkButton id="PButton" label="+" click="expandNodeHandle(_direction)" width="26" height="26" icon="@Embed(source='/assets/add.png')" />
 </mx:HBox>

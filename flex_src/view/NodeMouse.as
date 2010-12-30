@@ -44,6 +44,10 @@ private function mouseOverHandle(event : MouseEvent) :void
     if(mainModel.isDraging&&mainModel.dragNode!=this) {
         this.setStyle("backgroundAlpha",0);
         this.setStyle("borderStyle","inset");
+		if(mainModel.dragNode._parentNode._parentNode == null)
+			mainModel.dragNode._dirFlag = (mouseX > this.width/2?"right":"left");
+		else
+			mainModel.dragNode._dirFlag = this._direction;
     }
 }
 private function mouseOutHandle(event : MouseEvent) : void
@@ -52,17 +56,34 @@ private function mouseOutHandle(event : MouseEvent) : void
     this.setStyle("borderStyle","none");
 }
 
-private function expandNodeHandle() : void
+private function expandNodeHandle(_direction : String) : void
 {
-    if(_childNodes.length == 0) return;
-    if(_isExpanding) {
-        _expandNodesSpace = _childNodesSpace;
-        childNodesSpace = -_expandNodesSpace;
-        _isExpanding = false;
-    } else {
-        childNodesSpace = _expandNodesSpace;
-        _isExpanding = true;
-    }
-    hideNodeHandle(_childNodes,_isExpanding);
+    if(getChildNodes("right").length + getChildNodes("left") == 0) return;
+	if(_parentNode==null) {
+		if(_isExpanding) {
+			setExpandNodesSpace(getChildNodesSpace("right"),"right");
+			setExpandNodesSpace(getChildNodesSpace("left"),"left");
+			changeChildNodesSpace(-getExpandNodesSpace("right"),"right");
+			changeChildNodesSpace(-getExpandNodesSpace("left"),"left");
+			_isExpanding = false;
+		} else {
+			changeChildNodesSpace(getChildNodesSpace("right"),"right");
+			changeChildNodesSpace(getChildNodesSpace("left"),"left");
+			_isExpanding = true;
+		}
+		hideNodeHandle(getChildNodes("right"),_isExpanding);
+		hideNodeHandle(getChildNodes("left"),_isExpanding);
+	} else {
+		if(_isExpanding) {
+			setExpandNodesSpace(getChildNodesSpace(_direction),_direction);
+			changeChildNodesSpace(-getChildNodesSpace(_direction),_direction);
+	        _isExpanding = false;
+	    } else {
+			changeChildNodesSpace(getChildNodesSpace(_direction),_direction);
+	        _isExpanding = true;
+	    }
+		hideNodeHandle(getChildNodes(this._direction),_isExpanding);
+	}
+	
     refresh();
 }
