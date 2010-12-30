@@ -44,7 +44,7 @@ private function mouseOverHandle(event : MouseEvent) :void
     if(mainModel.isDraging&&mainModel.dragNode!=this) {
         this.setStyle("backgroundAlpha",0);
         this.setStyle("borderStyle","inset");
-		if(mainModel.dragNode._parentNode._parentNode == null)
+		if(this._parentNode == null)
 			mainModel.dragNode._dirFlag = (mouseX > this.width/2?"right":"left");
 		else
 			mainModel.dragNode._dirFlag = this._direction;
