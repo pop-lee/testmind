@@ -102,9 +102,9 @@
 			private function setExpandNodesSpace(_expandNodesSpace : Number , _direction : String) : void
 			{
 				if(_direction == "right")
-					_expandNodesSpace = _expandNodesSpace;
+					this._expandNodesSpace = _expandNodesSpace;
 				else if(_direction == "left")
-					_leftExpandNodesSpace = _expandNodesSpace;
+					this._leftExpandNodesSpace = _expandNodesSpace;
 			}
             
             private function getChildNodesSpace(_direction : String) : Number

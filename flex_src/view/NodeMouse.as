@@ -67,8 +67,10 @@ private function expandNodeHandle(_direction : String) : void
 			changeChildNodesSpace(-getExpandNodesSpace("left"),"left");
 			_isExpanding = false;
 		} else {
-			changeChildNodesSpace(getChildNodesSpace("right"),"right");
-			changeChildNodesSpace(getChildNodesSpace("left"),"left");
+			changeChildNodesSpace(getExpandNodesSpace("right"),"right");
+			changeChildNodesSpace(getExpandNodesSpace("left"),"left");
+		    setExpandNodesSpace(0,"right");
+		    setExpandNodesSpace(0,"left");
 			_isExpanding = true;
 		}
 		hideNodeHandle(getChildNodes("right"),_isExpanding);
@@ -79,7 +81,8 @@ private function expandNodeHandle(_direction : String) : void
 			changeChildNodesSpace(-getChildNodesSpace(_direction),_direction);
 	        _isExpanding = false;
 	    } else {
-			changeChildNodesSpace(getChildNodesSpace(_direction),_direction);
+			changeChildNodesSpace(getExpandNodesSpace(_direction),_direction);
+			setExpandNodesSpace(0,_direction);
 	        _isExpanding = true;
 	    }
 		hideNodeHandle(getChildNodes(this._direction),_isExpanding);
