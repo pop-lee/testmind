@@ -55,7 +55,7 @@
             private var _rightChildNodesSpace : Number = 0;
 			private var _leftChildNodesSpace : Number = 0;
 			
-            private var _expandNodesSpace : Number = 0;
+            private var _rightExpandNodesSpace : Number = 0;
 			private var _leftExpandNodesSpace : Number = 0;
             
             private var _isExpanding : Boolean = true;
@@ -79,6 +79,9 @@
             [Bindable]
             public var isEditable : Boolean = false;
             
+            /**
+             * 节点方向的 set get 方法
+             */
             override public function set direction(_direction : String) : void
             {
 				_dirFlag = this._direction = _direction;
@@ -90,23 +93,40 @@
 //				else 
 //					return _direction = _parentNode._direction;
 			}
+			
+			/**
+             * 获取指定方向的折叠子节点的空间
+             * @param _direction  要获取折叠子节点的方向
+             * @return 返回指定方向的折叠子节点占用的空间
+             */
 			private function getExpandNodesSpace(_direction : String) : Number
 			{
 				if(_direction == "right")
-					return _expandNodesSpace;
+					return _rightExpandNodesSpace;
 				else if(_direction == "left")
 					return _leftExpandNodesSpace;
 				else
 					throw new Error("this Node not hav direction!");
 			}
+			
+			/**
+			 * 设置指定方向的折叠子节点占用的空间
+             * @param _expandNodesSpace 折叠子节点所占用的空间
+             * @param _direction 折叠子节点的方向
+             */
 			private function setExpandNodesSpace(_expandNodesSpace : Number , _direction : String) : void
 			{
 				if(_direction == "right")
-					this._expandNodesSpace = _expandNodesSpace;
+					this._rightExpandNodesSpace = _expandNodesSpace;
 				else if(_direction == "left")
 					this._leftExpandNodesSpace = _expandNodesSpace;
 			}
             
+            /**
+             * 获取子节点占用空间大小
+             * @param _direction 要获取的子节点方向
+             * @return 返回要获取子节点方向上子节点
+             */
             private function getChildNodesSpace(_direction : String) : Number
 			{
 				if(_direction == "right")
@@ -116,6 +136,13 @@
 				else
 					throw new Error("this Node not hav direction!");
 			}
+			
+			/**
+			 * 设置子节点的占用空间
+			 * @param _childNodesSpace 子节点占用的空间
+			 * @param _direction 子节点方向
+			 * 
+			 */
 			private function setChildNodesSpace(_childNodesSpace : Number,_direction : String) : void
 			{
 				if(_direction == "right")
@@ -124,6 +151,11 @@
 					_leftChildNodesSpace = _childNodesSpace;
 			}
 			
+			/**
+			 * 根据方向获取子节点数组对象
+			 * @param _direction 要获取的子节点的方向
+			 * @return 返回下一层子节点数组对象
+			 */
 			private function getChildNodes(_direction : String) : ArrayCollection
 			{
 				if(_direction == "right")
@@ -134,7 +166,9 @@
 					throw new Error("this Node not hav direction!");
 			}
 			
-            //设置父节点
+            /**
+            * 子节点设置父节点的 set get 方法
+            */ 
             public function set parentNode(_parentNode : Node) : void
             {
                 this._parentNode = _parentNode;
@@ -145,13 +179,19 @@
                 return _parentNode;
             }
             
-            //节点占用空间
+            /**
+            * @return 获得当前节点及其子节点所占用空间
+            */
             private function get nodeSpace() : Number
             {
             	return (this.height > this.getChildNodesSpace(_direction)?this.height : this.getChildNodesSpace(_direction));
             }
             
-            //添加子节点
+            /**
+            * addChildNode(_node : Node) 添加子节点方法
+            * @param _node 要添加的子节点对象
+            */
+            
             private function addChildNode(_node : Node) : void
             {
                 _node._level = _level+1;
@@ -177,6 +217,11 @@
                 refresh();
             }
 			
+			/**
+			 * 当子节点改变方向执行
+			 * changeDir(_node ： Node) 
+			 * @param _node 拖动的子节点
+			 */
 			private function changeDir(_node : Node) : void
 			{
 				if(_node._direction == "right") {
@@ -184,12 +229,16 @@
 					_node.getChildNodes("right").removeAll();
 					_node.setChildNodesSpace(_node.getChildNodesSpace("right"),"left");
 					_node.setChildNodesSpace(0,"right");
+					_node.setExpandNodesSpace(_node._rightExpandNodesSpace,"left");
+					_node.setExpandNodesSpace(0,"right");
 					_node.direction = "left";
 				} else if(_node._direction == "left") {
 					_node.getChildNodes("right").addAll(_node.getChildNodes("left"));
 					_node.getChildNodes("left").removeAll();
 					_node.setChildNodesSpace(_node.getChildNodesSpace("left"),"right");
 					_node.setChildNodesSpace(0,"left");
+					_node.setExpandNodesSpace(_node._rightExpandNodesSpace,"right");
+                    _node.setExpandNodesSpace(0,"left")
 					_node.direction = "right";
 				}
 				for each(var _tempNode : Node in _node.getChildNodes(_node._direction)) {
@@ -197,7 +246,10 @@
 				}
 			}
             
-            //删除节点
+            /**
+             * 删除指定子节点
+             * @param _node 要删除的子节点对象
+             */
             public function removeChildNode(_node : Node) : void
             {
 				getChildNodes(_node._direction).length>1?
@@ -209,6 +261,11 @@
             }
             
             //设置所有子节点占用空间大小
+            /**
+             * 更改子节点占用空间大小
+             * @param _nodeSpace 变更占用空间大小
+             * @param _direction 变更占用空间大小的方向
+             */
             private function changeChildNodesSpace(_nodeSpace : Number,_direction : String) : void
             {
 //                if(this.height > _childNodesSpace  + _nodeSpace) {
@@ -231,12 +288,19 @@
 //                }
             }
             
+            /**
+             * 
+             */
             private function creaHandle() : void
             {
 //                _childNodesSpace = this.nodeSpace;
             }
             
-            //获取线段出口端点
+            /**
+             * 获取节点连线的出口Point对象
+             * @param _direction 要获取连线的方向
+             * @return 返回要获取方向的连线出口Point对象
+             */
             private function getPointOut(_direction : String) : Point
             {
 				if(_direction == "right") {
@@ -251,6 +315,10 @@
             }
             
             //获取线段入口端点
+            /**
+             * 获取节点连线的入口Point对象
+             * @return 返回要获取方向的连线入口Point对象
+             */
             private function getPointIn()  : Point
             {
 				if(_direction == "right") {
@@ -264,7 +332,9 @@
                 return _pointIn;
             }
             
-            //更改节点执行触发
+            /**
+             * 更新文本组件的UI
+             */
             private function updateTextField() : void
             {
                 content.width = (content.textWidth==0?30:content.textWidth) + this.getStyle("fontSize")*3;
@@ -298,6 +368,11 @@
             }
             
             //隐藏节点执行
+            /**
+             * 隐藏节点操作
+             * @param _childNodes 要折叠的子节点对象数组
+             * @param _isHiden 是是否折叠 若为true 则执行展开操作 若为false 则执行折叠操作
+             */
             private function hideNodeHandle(_childNodes : ArrayCollection,_isHiden : Boolean) : void
             {
                 for each(var _node : Node in _childNodes) {
@@ -308,11 +383,17 @@
                 }
             }
             
+            /**
+             * 重新刷新全局页面
+             */
             private function refresh() : void
             {
                 TestMindMap.mainNode.refreshLine();
             }
             
+            /**
+             * 
+             */
             public function updateUI() : void
             {
                 
@@ -326,7 +407,10 @@
             }
             
             //作为父Node画线
-            public function refreshLine(event : CollectionEvent=null) : void
+            /**
+             * 重新画线操作
+             */
+            public function refreshLine() : void
             {
 				_lRule = -_leftChildNodesSpace/2;
                 _rRule = -_rightChildNodesSpace/2;
