@@ -7,6 +7,7 @@
     mouseUp="mouseUpHandle(event)"
     mouseOver="mouseOverHandle(event)"
     mouseOut="mouseOutHandle(event)" 
+    remove="{mainModel.main.removeChild(_linkLine)}"
     creationComplete="creaHandle()" 
     borderColor="0xff0000" borderStyle="none"
     horizontalScrollPolicy="off" verticalScrollPolicy="off"
@@ -55,6 +56,7 @@
             private var _rightChildNodesSpace : Number = 0;
 			private var _leftChildNodesSpace : Number = 0;
 			
+			//折叠的空间
             private var _rightExpandNodesSpace : Number = 0;
 			private var _leftExpandNodesSpace : Number = 0;
             
@@ -257,6 +259,10 @@
 					changeChildNodesSpace(0 - _node.nodeSpace,_node._direction);
                 
 				getChildNodes(_node._direction).removeItemAt(getChildNodes(_node._direction).getItemIndex(_node));
+				if(mainModel.dragNode == null) {
+				    mainModel.main.removeChild(_node);
+				}
+				
                 refresh();
             }
             
