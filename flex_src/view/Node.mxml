@@ -10,6 +10,7 @@
     remove="{mainModel.main.removeChild(_linkLine)}"
     creationComplete="creaHandle()" 
     borderColor="0xff0000" borderStyle="none"
+    horizontalAlign="center" verticalAlign="middle"
     horizontalScrollPolicy="off" verticalScrollPolicy="off"
     backgroundColor="0xffffff" backgroundAlpha="1" >
     <mx:Script source="NodeDrag.as" />
@@ -346,7 +347,7 @@
                 content.width = (content.textWidth==0?30:content.textWidth) + this.getStyle("fontSize")*3;
                 content.height = (content.textHeight==0?13:content.textHeight) + 15;
 				this.width = content.width + PButton.width;
-//				this.height = content.height + PButton.height;
+				this.height = content.height// + PButton.height;
 				
                 content.text = content.text;
                 content.horizontalScrollPosition = 0;
