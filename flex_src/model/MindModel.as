@@ -26,6 +26,8 @@ package model
         
         public var isDraging : Boolean = false;
         
+        public var ctrlKeyDown : Boolean = false;
+        
         [Bindable]
         public var parentSpacing : int = 40;
         
