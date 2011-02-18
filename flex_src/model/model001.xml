@@ -7,18 +7,18 @@
 	        <node>
 	            <content>001</content>
 	        </node>
-        </node>
-        <node>
-            <direction>right</direction>
-            <content>002</content>
-        </node>
-        <node>
-            <direction>right</direction>
-            <content>003</content>
-        </node>
-        <node>
-            <direction>left</direction>
-            <content>004</content>
+	        <node>
+	            <direction>right</direction>
+	            <content>002</content>
+	        </node>
+	        <node>
+	            <direction>right</direction>
+	            <content>003</content>
+	        </node>
+	        <node>
+	            <direction>left</direction>
+	            <content>004</content>
+	        </node>
         </node>
     </Nodes>
 </Model>
