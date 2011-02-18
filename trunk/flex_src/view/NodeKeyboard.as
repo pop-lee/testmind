@@ -2,14 +2,6 @@
 import flash.events.KeyboardEvent;
 import flash.events.TextEvent;
 
-private var _ctrlKeyDown : Boolean = false;
-
-private function keyDownHandle(event : KeyboardEvent) : void
-{
-    if(event.ctrlKey)
-        _ctrlKeyDown = true;
-}
-
 private function keyUpHandle(event : KeyboardEvent) : void
 {
     if(mainModel.focusNode == this&&this.isEditable) {
@@ -18,11 +10,11 @@ private function keyUpHandle(event : KeyboardEvent) : void
             this.isEditable = false;
         }
     }
-    _ctrlKeyDown = false;
+    mainModel.ctrlKeyDown = false;
 }
 
 private function textInputHandle(event : TextEvent) : void
 {
-    if(event.text == "\n"&&_ctrlKeyDown)
+    if(event.text == "\n"&&mainModel.ctrlKeyDown)
         event.preventDefault();
 }

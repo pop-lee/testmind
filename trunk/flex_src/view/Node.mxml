@@ -261,6 +261,7 @@
                 
 				getChildNodes(_node._direction).removeItemAt(getChildNodes(_node._direction).getItemIndex(_node));
 				if(mainModel.dragNode == null) {
+				    _node.parentNode.setFocusNode();
 				    mainModel.main.removeChild(_node);
 				}
 				
@@ -453,7 +454,7 @@
         ]]>
     </mx:Script>
     <mx:TextArea id="content" editable="{isEditable}" selectable="{isEditable}" text="{nodeContent}" width="100%" height="100%"
-        paddingTop="5" creationComplete="updateTextField()" keyUp="keyUpHandle(event)" keyDown="keyDownHandle(event)"
+        paddingTop="5" creationComplete="updateTextField()" keyUp="keyUpHandle(event)" 
         textInput="textInputHandle(event)"
         doubleClickEnabled="true" doubleClick="{this.isEditable = true}" backgroundAlpha="0"
         change="updateTextField()" wordWrap="false" textAlign="center"
