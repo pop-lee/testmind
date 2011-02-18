@@ -6,6 +6,7 @@
     >
     <mx:Script>
         <![CDATA[
+            import mx.messaging.errors.NoChannelAvailableError;
             import flash.sampler.getInvocationCount;
             import mx.core.UIComponent;
             import mx.managers.DragManager;
@@ -31,7 +32,7 @@
                 mainNode.setFocusNode();
                 addChild(mainNode);
                 for each(var _xml : Object in xmllc) {
-                    createNode(_xml,mainNode);
+                    createNodefromXML(_xml,mainNode);
                 }
 //                var node2 : Node = new Node();
 //                node2.parentNode = mainNode;
@@ -48,7 +49,7 @@
 //                addChild(node5);
             }
             
-            private function createNode(obj : Object,_parentNode : Node) : void
+            private function createNodefromXML(obj : Object,_parentNode : Node) : void
             {
                 if(obj.hasOwnProperty("node")) {
                     
@@ -60,31 +61,56 @@
                             _node.direction = _childNode.direction;
                         _node.parentNode = _parentNode;
                         addChild(_node);
-                        createNode(_childNode,_node);
+                        createNodefromXML(_childNode,_node);
                     }
                 }
             }
             
             private function appHandle() : void
             {
-                this.stage.addEventListener(KeyboardEvent.KEY_UP,enterKeyHandle);
+                this.stage.addEventListener(KeyboardEvent.KEY_DOWN,keyDownHandle);
+                this.stage.addEventListener(KeyboardEvent.KEY_UP,keyUpHandle);
             }
             
-            private function enterKeyHandle(event : KeyboardEvent) : void
+            private function keyDownHandle(event : KeyboardEvent) : void
             {
-                var tempNode : Node ;
+                if(event.ctrlKey)
+                    mainModel.ctrlKeyDown = true;
+            }
+            
+            private function keyUpHandle(event : KeyboardEvent) : void
+            {
                 if(event.keyCode == 13) {
                     if(mainModel.focusNode!=null&&!mainModel.focusNode.isEditable) {
-                        tempNode = new Node();
-                        addChild(tempNode);
+//                        tempNode = new Node();
+//                        addChild(tempNode);
+//                        tempNode.isEditable = true;
+//                        tempNode.setFocusNode();
                         if(event.ctrlKey||mainModel.focusNode.parentNode==null)
-                            tempNode.parentNode = mainModel.focusNode;
+                            addNode(mainModel.focusNode);
                         else
-                            tempNode.parentNode = mainModel.focusNode.parentNode;
-                        tempNode.isEditable = true;
-                        tempNode.setFocusNode();
+                            addNode(mainModel.focusNode.parentNode);
                     }
                 }
+                if(event.keyCode == 46) {
+                    removeNode(mainModel.focusNode);
+                }
+            }
+            
+            private function addNode(_parentNode : Node) : void
+            {
+                var tempNode : Node ;
+                tempNode = new Node();
+                addChild(tempNode);
+                tempNode.isEditable = true;
+                tempNode.setFocusNode();
+                tempNode.parentNode = _parentNode;
+            }
+            
+            private function removeNode(_node : Node) : void
+            {
+                if(_node.parentNode!=null)
+                    _node.parentNode.removeChildNode(_node);
             }
             
             private function mouseDownHandle(event : MouseEvent) : void
@@ -122,5 +148,9 @@
     <mx:XMLList id="dp" xmlns="/model/model001.xml" />
     -->
     
-    
+    <mx:ApplicationControlBar width="100%">
+        <mx:LinkButton label="添加节点" click="addNode(mainModel.focusNode)" />
+        <mx:LinkButton label="删除节点" click="removeNode(mainModel.focusNode)" />
+        <mx:LinkButton label="" />
+    </mx:ApplicationControlBar>
 </mx:Application>
