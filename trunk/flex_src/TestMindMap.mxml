@@ -14,7 +14,7 @@
             import model.MindModel;
             import view.Node;
             
-            public static var mainNode : Node = new Node();
+            public static var mainNode : Node ;
             
             private var mainModel : MindModel = MindModel.getInstance();
             
@@ -26,13 +26,13 @@
             
             private function test() : void
             {
-                mainNode.x = this.width/3;
-                mainNode.y = this.height/3;
-//                mainNode.direction = "middle";
-                mainNode.setFocusNode();
-                addChild(mainNode);
+//                mainNode.x = this.width/3;
+//                mainNode.y = this.height/3;
+////                mainNode.direction = "middle";
+//                mainNode.setFocusNode();
+//                addChild(mainNode);
                 for each(var _xml : Object in xmllc) {
-                    createNodefromXML(_xml,mainNode);
+                    createNodefromXML(_xml,null);
                 }
 //                var node2 : Node = new Node();
 //                node2.parentNode = mainNode;
@@ -59,7 +59,14 @@
                             _node.nodeContent = _childNode.content;
                         if(_childNode.hasOwnProperty("direction")) 
                             _node.direction = _childNode.direction;
-                        _node.parentNode = _parentNode;
+                        if(_parentNode == null) {
+                            _node.x = this.width/3;
+                            _node.y = this.height/3;
+                            _node.setFocusNode();
+                            mainNode = _node;
+                        } else {
+                            _node.parentNode = _parentNode;
+                        }
                         addChild(_node);
                         createNodefromXML(_childNode,_node);
                     }
